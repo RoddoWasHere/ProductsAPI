@@ -1,5 +1,20 @@
 # API Documentation
 ## To get products: GET request to '/products'
+The response payload is as follows:
+
+```
+[
+    {
+        "sku": "abc",
+        "attributes": {
+            "size": "small",
+            "grams": "100",
+            "foo": "bar"
+        }
+    }
+]
+```
+
 ## To set products: POST request to '/products'
 
 The payload for the POST request uses a difference model which means that only the changes need to be in the request body.
