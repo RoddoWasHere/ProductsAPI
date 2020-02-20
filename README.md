@@ -34,13 +34,13 @@ In order to utilize a database (local/remote) we need to setup the credentials.
 
 2. in the '__DatabaseAdapterConfig' sub class, you should see a couple of lines like this:
 ```
-        ...
-self.mydb = mysql.connector.connect(
-    host="localhost",
-    user="root",
-    passwd="",
-)
-            ...
+...
+    self.mydb = mysql.connector.connect(
+        host="localhost",
+        user="root",
+        passwd="",
+    )
+    ...
 ```
 Replace these with your own credentials or that of the database you wish to use and save the file.
 
