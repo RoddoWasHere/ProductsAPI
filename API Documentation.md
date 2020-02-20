@@ -31,3 +31,4 @@ e.g.:
     }
 ]
 ```
+Note: A product with no attributes is simply and empty object `{}`
