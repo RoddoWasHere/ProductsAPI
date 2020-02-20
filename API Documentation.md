@@ -36,7 +36,7 @@ e.g.:
 ```
 
 - Products:
-Specifing a ```null``` value for an product's attributes will delete the product
+Specifing a ```null``` value for a product's attributes will delete the product
 e.g.:
 ```
 [
