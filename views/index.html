@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="js/angular.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Products</title>
+    <style>
+    td {
+        vertical-align: baseline;
+    }
+    table {
+        border-spacing: 0px;
+        border: 2px outset #999;
+        background: #eee;
+        border-radius: 3px;
+    }
+    td, th {
+        border: 1px solid #ccc;
+        padding: 0px 5px;
+    }
+    th {
+        background: #dee4ff;
+        padding: 5px 5px;
+    }
+    </style>
+</head>
+<body>
+<h1>Products</h1>
+<div ng-app="myApp" ng-controller="productsController">
+    <button ng-click="saveChanges()">Save changes</button>
+    <button ng-click="restoreChanges()">Restore changes</button>
+    <br/>
+    <br/>
+    <table>
+        <tr>
+            <th></th><th>SKU</th><th>attributes</th>
+        </tr>
+        <tr 
+            ng-repeat="product in products"
+            product-component product="{{product}}"
+            ng-controller='productController'
+            ng-show="product.attributes!==undefined"
+        >
+        </tr>
+        <tr>
+            <td colspan="9"><button ng-click="addProduct()">Add new product</button></td>
+        </tr>
+    </table>
+</div>
+<br/>
+<div style="height:1px;background: black;"></div>
+<h2>How to use:</h2>
+<p>Click the <button>></button> button to expand a given product's attributes.</p>
+<p><button>edit</button> modifies the value of an attribute</p>
+<p><button>delete</button> removes the attribute from the product</p>
+<p><button>Save changes</button> will save your current changes to the server</p>
+<p><button>Restore changes</button> will restore all products to the last successful save</p>
+<p>Click <a href="/configure">Configure</a> to configure the database if not initialized or working</p>
+<p>Click <a href="/design">Design</a> to read about the design choices in builing the app/API</p>
+
+<script>
+//Angular...
+var app = angular.module('myApp', []);
+
+app.controller('productController', ['$scope', function($scope) {
+    $scope.expandIcon = ">";
+    $scope.expanded = false;
+    $scope.data = {expandIcon: "?"};
+    $scope.onExpand = () => {
+        $scope.expanded = !$scope.expanded;
+        if($scope.expanded)
+            $scope.expandIcon = "v";
+        else
+            $scope.expandIcon = ">";
+    };
+    $scope.addAttribute = (product) => {
+        var name = prompt("attribute name:");
+        var value = prompt("attribute value:");
+        if(name!=null && name!="" && value!=null && value!=""){
+            if(product.attributes[name] === undefined){
+                product.attributes[name] = value;
+            }
+            else{
+                alert("an attribute with this name already exists");
+            }
+        }
+    };
+    $scope.editAttribute = (product, key) => {
+        var currentValue = product.attributes[key];
+        var value = prompt(key+" value:",currentValue);
+        if(value!=null && value!=""){
+            product.attributes[key] = value;
+        }
+    };
+    $scope.deleteAttribute = (product, key) => {
+        product.attributes[key] = undefined;
+    };
+    $scope.deleteProduct = (product) => {
+        product.attributes = undefined;
+    };
+}])
+.directive("productComponent", function() {
+    return {
+        restrict : "A",
+        template : `<td><button ng-click='onExpand()'>{{expandIcon}}</button></td>
+                    <td>{{product.sku}}</td>
+                    <td><button ng-click="deleteProduct(product)">delete product</button>
+                        <table ng-show="expanded">
+                            <tr>
+                                <th>attribute</th>
+                                <th>value</th>
+                            </tr>
+                            <tr ng-repeat="(key, value) in product.attributes" ng-show="value!=undefined">
+                                <td>{{key}}</td><td>{{value}}</td>
+                                <td><button ng-click="editAttribute(product, key)">edit</button></td>
+                                <td><button ng-click="deleteAttribute(product, key)">delete</button></td>
+                            </tr>
+                            <tr>
+                                <td colspan="9"><button ng-click="addAttribute(product, key)">Add new attribute</button><td>
+                            </tr>
+                        </table>
+                    </td>`
+    };
+});
+
+
+app.controller('productsController', function($scope, $http) {
+    $scope.products;
+
+    $scope.addProduct = () => {
+        var sku = prompt("product sku:");
+
+        //check if used already
+        skuArray = $scope.products.filter(val=>val.sku == sku);
+        if(skuArray.length>0){
+            alert("cannot create product as sku is already used");
+            return;
+        }
+
+        if(sku != null && sku != ""){
+            $scope.products.push({
+                sku: sku,
+                attributes: {},
+            });
+        }
+    };
+
+    //get data
+    fetchData = () => {
+        $http.get("/products").then(function (response) {
+            $scope.products = response.data;
+        },
+        function (response) {{}
+            alert("Error: database not configured/initialized");
+            if(confirm("Do you wish to navigate to the configuration page?")){
+                window.location.href = window.location.origin+"/configure";
+            }
+        });
+    };
+    $scope.saveChanges = () => {
+        $http.post("/products", $scope.products).then(function (response) {
+            alert("Save succeeded");
+            fetchData();
+        });
+    };
+    $scope.restoreChanges = () => {
+        fetchData();
+    };
+    fetchData();
+    window.scope = $scope;
+});
+</script>
+</body>
+</html>

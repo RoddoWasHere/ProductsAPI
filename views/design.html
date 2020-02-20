@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+<h1>Design choices</h1>
+<h2>Database</h2>
+<p>
+    To allow for a many to many relationship between Products and Attributes
+    I created the associative entity 'ProductAttribute'
+</p>
+<p>
+ERD:<br/>
+<code>                           
+|Product|-|o-----|<|ProductAttribute|>|-----|-|Attribute|
+</code>
+<p>
+I went for a very simple design here
+<h4>Table schema:</h4>
+Product
+<ul>
+    <li>sku : PK</li>
+</ul>
+Attribute
+<ul>
+    <li>name : PK</li>
+</ul>
+<em>(A better design might have been to use an auto increment primary key, which would have allowed for renaming of attributes)</em>
+<br/>
+<br/>
+ProductAttribute
+<ul>
+    <li>attribute_name : PK/FK</li>
+    <li>attribute_value : PK/FK</li>
+</ul>
+<em>(Compound primary key)</em>
+</p>
+</p>
+<h2>Server</h2>
+<p>I decided to use Python with Flask to illustrate some of the principles we spoke about namely singletons, persistent RAM between requests, and static classes.</p>   
+<p>For the server design I used an MVC
+<ul>
+    <li>Models: Separate models for Product, Attribute and ProductAttribute</li>
+    <li>Views: Basic single-page angularJS application (in one file for readability)</li>
+    <li>Controllers: One 'ProductsController' to consolidate the various models</li>
+    <li>---</li>
+    <li>Main server end-point handling requests and routing (app.py)</li>
+    <li>Utilies: (setup_database.py) Sets up the database. There's also a static class (Utils) in the database adapter using 'classmethods'.</li>
+    <li>Adapters: Created a custom database adapter to return lists of dictionaries and lookup dictionaries. Here I utilized a singleton to ensure only one database connection is ever created.</li>
+</ul>
+
+</p>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+<br/>
+</body>
+</html>

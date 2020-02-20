@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+
+
+
+<h1>Setup</h1>
+<h2>Configure database</h2>
+<p>To configure your local database settings, navigate to the file 'adapter/database_adapter'.
+In the 'DatabaseAdapter' class, provide the appropriate host, username and password. Once you have saved the file,
+reload this page and click 'Initialize Database'(below). This will create a database called 'ProductsRoderichDB'.
+When you're done with the application, you can drop the database by clicking 'Drop Database'(below).
+</p>
+<p>
+Once the database has been successfully initialized, you can then navigate to the home page <a href="/">Here</a>
+</p>
+<p>
+<em>
+Note: Reinitializing the database will clear any data previously stored.
+</em>
+</p>
+<button onclick="initDatabase()">Initialize Database</button>
+<button onclick="dropDatabase()">Drop Database</button>
+<br>
+<code id="codeInfo"></code>
+
+<script>
+var codeInfo = document.getElementById("codeInfo");
+
+function initDatabase(){
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            //callback(xhttp.responseText);
+            console.log("resp:", xhttp.responseText);
+            codeInfo.innerHTML = xhttp.responseText;
+        }
+    };
+    xhttp.open("GET", "/initialize_database", true);
+    xhttp.send();
+}
+function dropDatabase(){
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            //callback(xhttp.responseText);
+            console.log("resp:", xhttp.responseText);
+            codeInfo.innerHTML = xhttp.responseText;
+        }
+    };
+    xhttp.open("GET", "/drop_database", true);
+    xhttp.send();
+}
+</script>
+
+</body>
+</html>
